@@ -1,0 +1,118 @@
+{
+  "info": {
+    "_postman_id": "2f4e3c2d-6a2b-4a1f-b1f1-3b2a8d0c9a10",
+    "name": "Rideshare Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for all available API requests in the rideshare backend"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        { "name": "Passenger Register", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/passenger/register", "host": ["{{baseUrl}}"], "path": ["auth","passenger","register"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"+15551230000\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Passw0rd!\",\n  \"emergencyContacts\": \"[{\\\"name\\\":\\\"Jane\\\",\\\"phone\\\":\\\"+15551230001\\\"}]\"\n}" } } },
+        { "name": "Passenger Login (email only)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/passenger/login", "host": ["{{baseUrl}}"], "path": ["auth","passenger","login"] }, "body": { "mode": "raw", "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "Driver Register", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/driver/register", "host": ["{{baseUrl}}"], "path": ["auth","driver","register"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"Alex Rider\",\n  \"phone\": \"+15551230002\",\n  \"email\": \"driver@example.com\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "Driver Login (email only)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/driver/login", "host": ["{{baseUrl}}"], "path": ["auth","driver","login"] }, "body": { "mode": "raw", "raw": "{\n  \"email\": \"driver@example.com\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "Staff Login", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/staff/login", "host": ["{{baseUrl}}"], "path": ["auth","staff","login"] }, "body": { "mode": "raw", "raw": "{\n  \"username\": \"dispatcher1\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "Admin Register", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/admin/register", "host": ["{{baseUrl}}"], "path": ["auth","admin","register"] }, "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Root Admin\",\n  \"username\": \"rootadmin\",\n  \"password\": \"admin123\"\n}" } } },
+        { "name": "Admin Login", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/admin/login", "host": ["{{baseUrl}}"], "path": ["auth","admin","login"] }, "body": { "mode": "raw", "raw": "{\n  \"username\": \"rootadmin\",\n  \"password\": \"admin123\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Passengers",
+      "item": [
+        { "name": "List Passengers", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers", "host":["{{baseUrl}}"], "path":["passengers"] } } },
+        { "name": "Get Passenger", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] } } },
+        { "name": "Update Passenger", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"updated@example.com\",\n  \"emergencyContacts\": \"[]\"\n}" } } },
+        { "name": "Delete Passenger", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] } } },
+        { "name": "Get My Profile (Passenger)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] } } },
+        { "name": "Update My Profile (Passenger)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"myemail@example.com\",\n  \"emergencyContacts\": \"[{\\\"name\\\":\\\"Emergency Contact\\\",\\\"phone\\\":\\\"+15551230001\\\"}]\"\n}" } } },
+        { "name": "Rate Driver (Passenger)", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/rate-driver/1", "host":["{{baseUrl}}"], "path":["passengers","rate-driver","1"] }, "body": { "mode":"raw", "raw": "{\n  \"rating\": 4.5,\n  \"comment\": \"Great driver, very professional!\"\n}" } } }
+      ]
+    },
+    {
+      "name": "Drivers",
+      "item": [
+        { "name": "List Drivers", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers", "host":["{{baseUrl}}"], "path":["drivers"] } } },
+        { "name": "Get Driver", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/1", "host":["{{baseUrl}}"], "path":["drivers","1"] } } },
+        { "name": "Update Driver", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/1", "host":["{{baseUrl}}"], "path":["drivers","1"] }, "body": { "mode":"raw", "raw": "{\n  \"availability\": true,\n  \"carModel\": \"Toyota Yaris\"\n}" } } },
+        { "name": "Delete Driver", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/1", "host":["{{baseUrl}}"], "path":["drivers","1"] } } },
+        { "name": "Get My Profile (Driver)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/profile/me", "host":["{{baseUrl}}"], "path":["drivers","profile","me"] } } },
+        { "name": "Update My Profile (Driver)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/profile/me", "host":["{{baseUrl}}"], "path":["drivers","profile","me"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"driver@example.com\",\n  \"carPlate\": \"ABC123\",\n  \"carModel\": \"Toyota Camry\",\n  \"carColor\": \"White\"\n}" } } },
+        { "name": "Toggle My Availability", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/profile/me/toggle-availability", "host":["{{baseUrl}}"], "path":["drivers","profile","me","toggle-availability"] } } },
+        { "name": "Rate Passenger (Driver)", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/rate-passenger/1", "host":["{{baseUrl}}"], "path":["drivers","rate-passenger","1"] }, "body": { "mode":"raw", "raw": "{\n  \"rating\": 4.2,\n  \"comment\": \"Good passenger, on time!\"\n}" } } },
+        { "name": "Upload Documents", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/drivers/1/documents", "host":["{{baseUrl}}"], "path":["drivers","1","documents"] }, "body": { "mode": "formdata", "formdata": [ {"key":"nationalId","type":"file","src":[]}, {"key":"vehicleRegistration","type":"file","src":[]}, {"key":"insurance","type":"file","src":[]}, {"key":"document","type":"file","src":[]}, {"key":"license","type":"file","src":[]} ] } } }
+      ]
+    },
+    {
+      "name": "Staff",
+      "item": [
+        { "name": "Create Staff", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/staff", "host":["{{baseUrl}}"], "path":["staff"] }, "body": { "mode":"raw", "raw": "{\n  \"fullName\": \"Finance One\",\n  \"username\": \"finance1\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "List Staff", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/staff", "host":["{{baseUrl}}"], "path":["staff"] } } },
+        { "name": "Get Staff", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/staff/1", "host":["{{baseUrl}}"], "path":["staff","1"] } } },
+        { "name": "Update Staff", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/staff/1", "host":["{{baseUrl}}"], "path":["staff","1"] }, "body": { "mode":"raw", "raw": "{\n  \"salary\": 1000\n}" } } },
+        { "name": "Delete Staff", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/staff/1", "host":["{{baseUrl}}"], "path":["staff","1"] } } }
+      ]
+    },
+    {
+      "name": "Admins",
+      "item": [
+        { "name": "Create Admin", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins", "host":["{{baseUrl}}"], "path":["admins"] }, "body": { "mode":"raw", "raw": "{\n  \"fullName\": \"Admin Two\",\n  \"username\": \"admin2\",\n  \"password\": \"Passw0rd!\"\n}" } } },
+        { "name": "List Admins", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins", "host":["{{baseUrl}}"], "path":["admins"] } } },
+        { "name": "Get Admin", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/1", "host":["{{baseUrl}}"], "path":["admins","1"] } } },
+        { "name": "Update Admin", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/1", "host":["{{baseUrl}}"], "path":["admins","1"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"newadmin@example.com\"\n}" } } },
+        { "name": "Delete Admin", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/1", "host":["{{baseUrl}}"], "path":["admins","1"] } } },
+        { "name": "Approve Driver", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/drivers/1/approve", "host":["{{baseUrl}}"], "path":["admins","drivers","1","approve"] } } },
+        { "name": "Approve Driver Documents", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/drivers/1/documents/approve", "host":["{{baseUrl}}"], "path":["admins","drivers","1","documents","approve"] } } },
+        { "name": "Reject Driver Documents", "request": { "method": "POST", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/drivers/1/documents/reject", "host":["{{baseUrl}}"], "path":["admins","drivers","1","documents","reject"] } } },
+        { "name": "Get Pending Driver Documents", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/drivers/pending-documents", "host":["{{baseUrl}}"], "path":["admins","drivers","pending-documents"] } } },
+        { "name": "Filter Users by Role", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/users/filter?role=driver", "host":["{{baseUrl}}"], "path":["admins","users","filter"], "query": [ {"key": "role", "value": "driver"} ] } } },
+        { "name": "List Staff by Role", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/admins/staff?role=dispatcher", "host":["{{baseUrl}}"], "path":["admins","staff"], "query": [ {"key":"role","value":"dispatcher"} ] } } }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        { "name": "Create Role", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/roles", "host":["{{baseUrl}}"], "path":["roles"] }, "body": { "mode":"raw", "raw": "{\n  \"name\": \"finance\",\n  \"permissionIds\": [1,2]\n}" } } },
+        { "name": "List Roles", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/roles", "host":["{{baseUrl}}"], "path":["roles"] } } },
+        { "name": "Get Role", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/roles/1", "host":["{{baseUrl}}"], "path":["roles","1"] } } },
+        { "name": "Update Role", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/roles/1", "host":["{{baseUrl}}"], "path":["roles","1"] }, "body": { "mode":"raw", "raw": "{\n  \"name\": \"dispatcher\",\n  \"permissionIds\": [1,2,3]\n}" } } },
+        { "name": "Delete Role", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/roles/1", "host":["{{baseUrl}}"], "path":["roles","1"] } } }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "item": [
+        { "name": "Create Permission", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/permissions", "host":["{{baseUrl}}"], "path":["permissions"] }, "body": { "mode":"raw", "raw": "{\n  \"name\": \"passenger:read\"\n}" } } },
+        { "name": "List Permissions", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/permissions", "host":["{{baseUrl}}"], "path":["permissions"] } } },
+        { "name": "Get Permission", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/permissions/1", "host":["{{baseUrl}}"], "path":["permissions","1"] } } },
+        { "name": "Update Permission", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/permissions/1", "host":["{{baseUrl}}"], "path":["permissions","1"] }, "body": { "mode":"raw", "raw": "{\n  \"name\": \"passenger:update\"\n}" } } },
+        { "name": "Delete Permission", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/permissions/1", "host":["{{baseUrl}}"], "path":["permissions","1"] } } }
+      ]
+    },
+    {
+      "name": "Phone Authentication",
+      "item": [
+        { "name": "Request OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/request-otp", "host": ["{{baseUrl}}"], "path": ["auth","request-otp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
+        { "name": "Verify OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/verify-otp", "host": ["{{baseUrl}}"], "path": ["auth","verify-otp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\",\n  \"otp\": \"123456\"\n}" } } },
+        { "name": "Login with Phone", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
+        { "name": "Get User Profile", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{phoneAuthToken}}" } ], "url": { "raw": "{{baseUrl}}/auth/profile", "host": ["{{baseUrl}}"], "path": ["auth","profile"] } } }
+      ]
+    },
+    {
+      "name": "Legacy OTP",
+      "item": [
+        { "name": "Create Passenger With OTP (Send)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/createPassengerWithOtp", "host": ["{{baseUrl}}"], "path": ["createPassengerWithOtp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
+        { "name": "Verify Passenger OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/verifyPassengerOtp", "host": ["{{baseUrl}}"], "path": ["verifyPassengerOtp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\",\n  \"otp\": \"123456\"\n}" } } }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "authToken", "value": "" },
+    { "key": "phoneAuthToken", "value": "" }
+  ]
+}
+
+
