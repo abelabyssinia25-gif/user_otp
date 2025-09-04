@@ -43,12 +43,12 @@ function createAdvancedOtpUtil(opts = {}) {
       phone = await normalizePhone(phoneNumber);
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
-      if (!['User'].includes(referenceType)) throw new Error('Reference type must be User');
-      const Model = models.User;
-      if (!Model) throw new Error('User model not available');
+      if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
+      const Model = models.Passenger;
+      if (!Model) throw new Error('Passenger model not available');
       const modelInstance = await Model.findByPk(referenceId);
-      if (!modelInstance) throw new Error('User not found');
-      if (!modelInstance.phone) throw new Error('User has no phone number');
+      if (!modelInstance) throw new Error('Passenger not found');
+      if (!modelInstance.phone) throw new Error('Passenger has no phone number');
       phone = await normalizePhone(modelInstance.phone);
       refType = referenceType;
       refId = referenceId;
@@ -95,12 +95,12 @@ function createAdvancedOtpUtil(opts = {}) {
       phone = await normalizePhone(phoneNumber);
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
-      if (!['User'].includes(referenceType)) throw new Error('Reference type must be User');
-      const Model = models.User;
-      if (!Model) throw new Error('User model not available');
+      if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
+      const Model = models.Passenger;
+      if (!Model) throw new Error('Passenger model not available');
       const modelInstance = await Model.findByPk(referenceId);
-      if (!modelInstance) throw new Error('User not found');
-      if (!modelInstance.phone) throw new Error('User has no phone number');
+      if (!modelInstance) throw new Error('Passenger not found');
+      if (!modelInstance.phone) throw new Error('Passenger has no phone number');
       phone = await normalizePhone(modelInstance.phone);
       refType = referenceType;
       refId = referenceId;

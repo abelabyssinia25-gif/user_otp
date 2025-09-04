@@ -25,9 +25,10 @@
         { "name": "Get Passenger", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] } } },
         { "name": "Update Passenger", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"updated@example.com\",\n  \"emergencyContacts\": \"[]\"\n}" } } },
         { "name": "Delete Passenger", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/1", "host":["{{baseUrl}}"], "path":["passengers","1"] } } },
-        { "name": "Get My Profile (Passenger)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] } } },
-        { "name": "Update My Profile (Passenger)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"myemail@example.com\",\n  \"emergencyContacts\": \"[{\\\"name\\\":\\\"Emergency Contact\\\",\\\"phone\\\":\\\"+15551230001\\\"}]\"\n}" } } },
-        { "name": "Rate Driver (Passenger)", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{authToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/rate-driver/1", "host":["{{baseUrl}}"], "path":["passengers","rate-driver","1"] }, "body": { "mode":"raw", "raw": "{\n  \"rating\": 4.5,\n  \"comment\": \"Great driver, very professional!\"\n}" } } }
+        { "name": "Get My Profile (Passenger)", "request": { "method": "GET", "header": [ {"key":"Authorization","value":"Bearer {{phoneAuthToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] } } },
+        { "name": "Update My Profile (Passenger)", "request": { "method": "PUT", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{phoneAuthToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] }, "body": { "mode":"raw", "raw": "{\n  \"email\": \"myemail@example.com\",\n  \"emergencyContacts\": \"[{\\\"name\\\":\\\"Emergency Contact\\\",\\\"phone\\\":\\\"+15551230001\\\"}]\"\n}" } } },
+        { "name": "Delete My Account (Passenger)", "request": { "method": "DELETE", "header": [ {"key":"Authorization","value":"Bearer {{phoneAuthToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/profile/me", "host":["{{baseUrl}}"], "path":["passengers","profile","me"] } } },
+        { "name": "Rate Driver (Passenger)", "request": { "method": "POST", "header": [ {"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{phoneAuthToken}}"} ], "url": { "raw": "{{baseUrl}}/passengers/rate-driver/1", "host":["{{baseUrl}}"], "path":["passengers","rate-driver","1"] }, "body": { "mode":"raw", "raw": "{\n  \"rating\": 4.5,\n  \"comment\": \"Great driver, very professional!\"\n}" } } }
       ]
     },
     {
@@ -96,16 +97,10 @@
         { "name": "Request OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/request-otp", "host": ["{{baseUrl}}"], "path": ["auth","request-otp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
         { "name": "Verify OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/verify-otp", "host": ["{{baseUrl}}"], "path": ["auth","verify-otp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\",\n  \"otp\": \"123456\"\n}" } } },
         { "name": "Login with Phone", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
-        { "name": "Get User Profile", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{phoneAuthToken}}" } ], "url": { "raw": "{{baseUrl}}/auth/profile", "host": ["{{baseUrl}}"], "path": ["auth","profile"] } } }
+        { "name": "Get Passenger Profile (Auth)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{phoneAuthToken}}" } ], "url": { "raw": "{{baseUrl}}/auth/profile", "host": ["{{baseUrl}}"], "path": ["auth","profile"] } } }
       ]
     },
-    {
-      "name": "Legacy OTP",
-      "item": [
-        { "name": "Create Passenger With OTP (Send)", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/createPassengerWithOtp", "host": ["{{baseUrl}}"], "path": ["createPassengerWithOtp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" } } },
-        { "name": "Verify Passenger OTP", "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" } ], "url": { "raw": "{{baseUrl}}/verifyPassengerOtp", "host": ["{{baseUrl}}"], "path": ["verifyPassengerOtp"] }, "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\",\n  \"otp\": \"123456\"\n}" } } }
-      ]
-    }
+    
   ],
   "event": [],
   "variable": [

@@ -21,29 +21,25 @@ async function authenticatePhoneUser(req, res, next) {
     try {
       const decoded = verifyToken(token);
       
-      // Verify token is for phone user
-      if (decoded.type !== 'user' || !decoded.verified) {
+      // Verify token is for passenger
+      if (decoded.type !== 'passenger') {
         return res.status(401).json({
           success: false,
           message: 'Invalid token type'
         });
       }
 
-      // Check if user still exists and is active
-      const user = await models.User.findByPk(decoded.id);
-      if (!user || user.status !== 'active') {
+      // Check if passenger still exists
+      const passenger = await models.Passenger.findByPk(decoded.id);
+      if (!passenger) {
         return res.status(401).json({
           success: false,
-          message: 'User not found or inactive'
+          message: 'Passenger not found'
         });
       }
 
       // Attach user to request
-      req.user = {
-        id: user.id,
-        phone: user.phone,
-        status: user.status
-      };
+      req.user = { id: passenger.id, type: 'passenger' };
 
       next();
     } catch (tokenError) {
@@ -93,14 +89,10 @@ async function optionalPhoneAuth(req, res, next) {
     try {
       const decoded = verifyToken(token);
       
-      if (decoded.type === 'user' && decoded.verified) {
-        const user = await models.User.findByPk(decoded.id);
-        if (user && user.status === 'active') {
-          req.user = {
-            id: user.id,
-            phone: user.phone,
-            status: user.status
-          };
+      if (decoded.type === 'passenger') {
+        const passenger = await models.Passenger.findByPk(decoded.id);
+        if (passenger) {
+          req.user = { id: passenger.id, type: 'passenger' };
         }
       }
     } catch (tokenError) {

@@ -1,5 +1,6 @@
 const { models } = require('../models');
-const { generateUserToken } = require('../utils/jwt');
+const { generateToken } = require('../utils/jwt');
+const { hashPassword } = require('../utils/password');
 const createAdvancedOtpUtil = require('../utils/createAdvancedOtpUtil');
 
 // Initialize OTP utility
@@ -64,20 +65,26 @@ async function requestOtp(req, res) {
 
     const normalizedPhone = normalizePhone(phone);
 
-    // Create or find user with pending status
-    let user = await models.User.findOne({ where: { phone: normalizedPhone } });
-    if (!user) {
-      user = await models.User.create({ 
-        phone: normalizedPhone, 
-        status: 'pending' 
+    // Create or find Passenger by phone
+    let passenger = await models.Passenger.findOne({ where: { phone: normalizedPhone } });
+    if (!passenger) {
+      const randomPassword = Math.random().toString(36).slice(2, 12) + '!A1';
+      const hashed = await hashPassword(randomPassword);
+      const nameSuffix = normalizedPhone.slice(-4);
+      passenger = await models.Passenger.create({
+        name: `Passenger ${nameSuffix}`,
+        phone: normalizedPhone,
+        email: null,
+        emergencyContacts: null,
+        password: hashed
       });
     }
 
     // Generate and send OTP
     try {
       const otpResponse = await otpUtil.generateAndSendOtp({
-        referenceType: 'User',
-        referenceId: user.id,
+        referenceType: 'Passenger',
+        referenceId: passenger.id,
         phoneNumber: normalizedPhone
       });
 
@@ -135,39 +142,39 @@ async function verifyOtp(req, res) {
 
     const normalizedPhone = normalizePhone(phone);
 
-    // Find user
-    const user = await models.User.findOne({ where: { phone: normalizedPhone } });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found. Please request OTP first.'
+    // Find passenger
+    let passenger = await models.Passenger.findOne({ where: { phone: normalizedPhone } });
+    if (!passenger) {
+      const randomPassword = Math.random().toString(36).slice(2, 12) + '!A1';
+      const hashed = await hashPassword(randomPassword);
+      const nameSuffix = normalizedPhone.slice(-4);
+      passenger = await models.Passenger.create({
+        name: `Passenger ${nameSuffix}`,
+        phone: normalizedPhone,
+        email: null,
+        emergencyContacts: null,
+        password: hashed
       });
     }
 
     // Verify OTP
     try {
       await otpUtil.verifyOtp({
-        referenceType: 'User',
-        referenceId: user.id,
+        referenceType: 'Passenger',
+        referenceId: passenger.id,
         token: otp,
         phoneNumber: normalizedPhone
       });
 
-      // Activate user account
-      if (user.status !== 'active') {
-        await user.update({ status: 'active' });
-      }
-
-      // Generate JWT token
-      const token = generateUserToken(user);
+      // Generate JWT token for Passenger
+      const token = generateToken({ id: passenger.id, type: 'passenger', roles: [], permissions: [] });
 
       return res.status(200).json({
         success: true,
         message: 'OTP verified successfully. Account activated.',
-        user: {
-          id: user.id,
-          phone: user.phone,
-          status: 'active'
+        passenger: {
+          id: passenger.id,
+          phone: passenger.phone
         },
         token
       });
@@ -233,30 +240,24 @@ async function loginWithPhone(req, res) {
     const normalizedPhone = normalizePhone(phone);
 
     // Find active user
-    const user = await models.User.findOne({ 
-      where: { 
-        phone: normalizedPhone,
-        status: 'active'
-      } 
-    });
+    const passenger = await models.Passenger.findOne({ where: { phone: normalizedPhone } });
 
-    if (!user) {
+    if (!passenger) {
       return res.status(404).json({
         success: false,
-        message: 'User not found or not verified. Please verify your phone number first.'
+        message: 'Passenger not found. Please verify your phone number first.'
       });
     }
 
-    // Generate JWT token
-    const token = generateUserToken(user);
+    // Generate JWT token for Passenger
+    const token = generateToken({ id: passenger.id, type: 'passenger', roles: [], permissions: [] });
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
-      user: {
-        id: user.id,
-        phone: user.phone,
-        status: user.status
+      passenger: {
+        id: passenger.id,
+        phone: passenger.phone
       },
       token
     });
@@ -284,22 +285,17 @@ async function getUserProfile(req, res) {
       });
     }
 
-    const user = await models.User.findByPk(userId);
-    if (!user) {
+    const passenger = await models.Passenger.findByPk(userId);
+    if (!passenger) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'Passenger not found'
       });
     }
 
     return res.status(200).json({
       success: true,
-      user: {
-        id: user.id,
-        phone: user.phone,
-        status: user.status,
-        createdAt: user.createdAt
-      }
+      passenger: passenger
     });
   } catch (error) {
     console.error('Get profile error:', error);
