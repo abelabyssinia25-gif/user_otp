@@ -9,14 +9,12 @@ async function authenticatePhoneUser(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access token required'
-      });
+    // Accept token from Authorization header (Bearer) or token query param for redirect flow
+    const bearer = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    const token = bearer || req.query.token || req.body?.token;
+    if (!token) {
+      return res.status(401).json({ success: false, message: 'Access token required' });
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
     try {
       const decoded = verifyToken(token);
