@@ -37,11 +37,12 @@ function createAdvancedOtpUtil(opts = {}) {
   async function generateAndSendOtp({ referenceType, referenceId, phoneNumber }) {
     const { Op, models } = require('../models');
     let phone;
+    let phoneE164;
     let refType = referenceType || 'direct';
     let refId = referenceId || 0;
     if (phoneNumber) {
-      phone = await normalizePhone(phoneNumber);
-      phone = phone.replace(/\D/g, '');
+      phoneE164 = await normalizePhone(phoneNumber);
+      phone = phoneE164.replace(/\D/g, '');
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
       if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
@@ -50,8 +51,8 @@ function createAdvancedOtpUtil(opts = {}) {
       const modelInstance = await Model.findByPk(referenceId);
       if (!modelInstance) throw new Error('Passenger not found');
       if (!modelInstance.phone) throw new Error('Passenger has no phone number');
-      phone = await normalizePhone(modelInstance.phone);
-      phone = phone.replace(/\D/g, '');
+      phoneE164 = await normalizePhone(modelInstance.phone);
+      phone = phoneE164.replace(/\D/g, '');
       refType = referenceType;
       refId = referenceId;
     }
@@ -84,12 +85,12 @@ function createAdvancedOtpUtil(opts = {}) {
     try {
       const sms = await createSingleSMSUtil({ token });
       const msg = `Your OTP is ${tokenValue}. It expires in ${Math.floor(otpExpirationSeconds/60)} minutes.`;
-      const smsResult = await sms.sendSingleSMS({ phone, msg });
-      return { success: true, message: 'OTP sent successfully', expiresIn: otpExpirationSeconds, phoneNumber: phone, sms: smsResult.data };
+      const smsResult = await sms.sendSingleSMS({ phone: phoneE164 || ('+' + phone), msg });
+      return { success: true, message: 'OTP sent successfully', expiresIn: otpExpirationSeconds, phoneNumber: phoneE164 || ('+' + phone), sms: smsResult.data };
     } catch (e) {
       // Do not fail OTP generation if SMS provider fails. Log and return success.
-      console.log(`[OTP SMS ERROR] phone=${phone} err=${e && e.message}`);
-      return { success: true, message: 'OTP generated', expiresIn: otpExpirationSeconds, phoneNumber: phone };
+      console.log(`[OTP SMS ERROR] phone=${phoneE164 || ('+' + phone)} err=${e && e.message}`);
+      return { success: true, message: 'OTP generated', expiresIn: otpExpirationSeconds, phoneNumber: phoneE164 || ('+' + phone) };
     }
   }
 
@@ -97,11 +98,12 @@ function createAdvancedOtpUtil(opts = {}) {
     const { Op, models } = require('../models');
     if (!token) throw new Error('Token is required');
     let phone;
+    let phoneE164;
     let refType = referenceType || 'direct';
     let refId = referenceId || 0;
     if (phoneNumber) {
-      phone = await normalizePhone(phoneNumber);
-      phone = phone.replace(/\D/g, '');
+      phoneE164 = await normalizePhone(phoneNumber);
+      phone = phoneE164.replace(/\D/g, '');
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
       if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
@@ -110,8 +112,8 @@ function createAdvancedOtpUtil(opts = {}) {
       const modelInstance = await Model.findByPk(referenceId);
       if (!modelInstance) throw new Error('Passenger not found');
       if (!modelInstance.phone) throw new Error('Passenger has no phone number');
-      phone = await normalizePhone(modelInstance.phone);
-      phone = phone.replace(/\D/g, '');
+      phoneE164 = await normalizePhone(modelInstance.phone);
+      phone = phoneE164.replace(/\D/g, '');
       refType = referenceType;
       refId = referenceId;
     }
