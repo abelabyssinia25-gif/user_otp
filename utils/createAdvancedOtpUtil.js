@@ -41,6 +41,7 @@ function createAdvancedOtpUtil(opts = {}) {
     let refId = referenceId || 0;
     if (phoneNumber) {
       phone = await normalizePhone(phoneNumber);
+      phone = phone.replace(/\D/g, '');
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
       if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
@@ -50,6 +51,7 @@ function createAdvancedOtpUtil(opts = {}) {
       if (!modelInstance) throw new Error('Passenger not found');
       if (!modelInstance.phone) throw new Error('Passenger has no phone number');
       phone = await normalizePhone(modelInstance.phone);
+      phone = phone.replace(/\D/g, '');
       refType = referenceType;
       refId = referenceId;
     }
@@ -93,6 +95,7 @@ function createAdvancedOtpUtil(opts = {}) {
     let refId = referenceId || 0;
     if (phoneNumber) {
       phone = await normalizePhone(phoneNumber);
+      phone = phone.replace(/\D/g, '');
     } else {
       if (!referenceType || !referenceId) throw new Error('Reference type and ID are required');
       if (!['Passenger'].includes(referenceType)) throw new Error('Reference type must be Passenger');
@@ -102,6 +105,7 @@ function createAdvancedOtpUtil(opts = {}) {
       if (!modelInstance) throw new Error('Passenger not found');
       if (!modelInstance.phone) throw new Error('Passenger has no phone number');
       phone = await normalizePhone(modelInstance.phone);
+      phone = phone.replace(/\D/g, '');
       refType = referenceType;
       refId = referenceId;
     }
