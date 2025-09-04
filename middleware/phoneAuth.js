@@ -11,7 +11,7 @@ async function authenticatePhoneUser(req, res, next) {
     
     // Accept token from Authorization header (Bearer) or token query param for redirect flow
     const bearer = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
-    const token = bearer || req.query.token || req.body?.token;
+    const token = req.query.token || req.body?.token || bearer;
     if (!token) {
       return res.status(401).json({ success: false, message: 'Access token required' });
     }
