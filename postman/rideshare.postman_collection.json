@@ -12,6 +12,51 @@
       "name": "Auth",
       "item": [
         {
+          "name": "Passenger Register (Phone → Request OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/auth/passenger/register-phone",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","passenger","register-phone"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Passenger OTP (302 → profile)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json.token) { pm.environment.set('token', json.token); pm.environment.set('authToken', json.token); }",
+                  "if (json.redirect) pm.environment.set('redirectUrl', json.redirect);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"+251912345678\",\n  \"otp\": \"123456\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/auth/passenger/verify-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","passenger","verify-otp"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Passenger Register",
           "request": {
             "method": "POST",

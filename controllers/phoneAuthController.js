@@ -306,9 +306,65 @@ async function getUserProfile(req, res) {
   }
 }
 
+/**
+ * Register passenger by phone and request OTP (alias for requestOtp)
+ * POST /auth/passenger/register-phone
+ */
+async function registerPassengerByPhone(req, res) {
+  return requestOtp(req, res);
+}
+
+/**
+ * Verify passenger OTP and redirect to profile with token in query
+ * POST /auth/passenger/verify-otp
+ */
+async function verifyPassengerOtpRedirect(req, res) {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ success: false, message: 'Phone and OTP are required' });
+    }
+    if (!isValidPhoneNumber(phone)) {
+      return res.status(400).json({ success: false, message: 'Invalid phone number format' });
+    }
+    const normalizedPhone = normalizePhone(phone);
+    let passenger = await models.Passenger.findOne({ where: { phone: normalizedPhone } });
+    if (!passenger) {
+      const randomPassword = Math.random().toString(36).slice(2, 12) + '!A1';
+      const hashed = await hashPassword(randomPassword);
+      const nameSuffix = normalizedPhone.slice(-4);
+      passenger = await models.Passenger.create({
+        name: `Passenger ${nameSuffix}`,
+        phone: normalizedPhone,
+        email: null,
+        emergencyContacts: null,
+        password: hashed
+      });
+    }
+
+    await otpUtil.verifyOtp({
+      referenceType: 'Passenger',
+      referenceId: passenger.id,
+      token: otp,
+      phoneNumber: normalizedPhone
+    });
+
+    const token = generateToken({ id: passenger.id, type: 'passenger', roles: [], permissions: [] });
+    const redirectUrl = '/api/passengers/profile/me?token=' + encodeURIComponent(token);
+    res.set('Location', redirectUrl);
+    return res.status(302).json({ success: true, message: 'Verified', redirect: redirectUrl, token, passenger: { id: passenger.id, phone: passenger.phone } });
+  } catch (error) {
+    const message = error && error.message ? error.message : 'Verification failed';
+    const status = /expired|Invalid|No valid/i.test(message) ? 400 : 500;
+    return res.status(status).json({ success: false, message });
+  }
+}
+
 module.exports = {
   requestOtp,
   verifyOtp,
   loginWithPhone,
-  getUserProfile
+  getUserProfile,
+  registerPassengerByPhone,
+  verifyPassengerOtpRedirect
 };
