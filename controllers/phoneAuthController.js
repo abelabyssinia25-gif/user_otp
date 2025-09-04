@@ -100,24 +100,8 @@ async function requestOtp(req, res) {
         return res.status(429).json({ success: false, message: otpError.message });
       }
 
-      // Fallback: create OTP record without sending SMS (dev/local)
-      try {
-        const crypto = require('crypto');
-        const { Op } = require('../models');
-        const otpLength = 6;
-        const min = 10 ** (otpLength - 1);
-        const max = 10 ** otpLength - 1;
-        const tokenValue = String(Math.floor(min + Math.random() * (max - min + 1)));
-        const hashedSecret = crypto.createHash('sha256').update(String(tokenValue)).digest('hex');
-        const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-        const phoneDigits = normalizedPhone.replace(/\D/g, '');
-        await models.Otp.destroy({ where: { phone: phoneDigits, referenceType: 'Passenger', referenceId: passenger.id, [Op.or]: [ { expiresAt: { [Op.lt]: Date.now() } }, { status: { [Op.in]: ['verified','expired'] } } ] } });
-        await models.Otp.create({ phone: phoneDigits, hashedSecret, expiresAt, attempts: 0, status: 'pending', referenceType: 'Passenger', referenceId: passenger.id });
-        console.log(`[OTP DEV] phone=${normalizedPhone} code=${tokenValue}`);
-        return res.status(200).json({ success: true, message: 'OTP generated (no SMS)', phoneNumber: normalizedPhone, expiresIn: 300 });
-      } catch (fallbackErr) {
-        return res.status(500).json({ success: false, message: 'Failed to send OTP. Please try again later.' });
-      }
+      // With internal util now swallowing SMS errors, respond success for client
+      return res.status(200).json({ success: true, message: 'OTP generated', phoneNumber: normalizedPhone, expiresIn: 300 });
     }
   } catch (error) {
     console.error('Request OTP error:', error);

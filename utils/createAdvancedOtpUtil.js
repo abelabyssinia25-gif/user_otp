@@ -81,10 +81,16 @@ function createAdvancedOtpUtil(opts = {}) {
     const expiresAt = Date.now() + otpExpirationSeconds * 1000;
     await models.Otp.create({ phone, hashedSecret, expiresAt, attempts: 0, status: 'pending', referenceType: refType, referenceId: refId });
 
-    const sms = await createSingleSMSUtil({ token });
-    const msg = `Your OTP is ${tokenValue}. It expires in ${Math.floor(otpExpirationSeconds/60)} minutes.`;
-    const smsResult = await sms.sendSingleSMS({ phone, msg });
-    return { success: true, message: 'OTP sent successfully', expiresIn: otpExpirationSeconds, phoneNumber: phone, sms: smsResult.data };
+    try {
+      const sms = await createSingleSMSUtil({ token });
+      const msg = `Your OTP is ${tokenValue}. It expires in ${Math.floor(otpExpirationSeconds/60)} minutes.`;
+      const smsResult = await sms.sendSingleSMS({ phone, msg });
+      return { success: true, message: 'OTP sent successfully', expiresIn: otpExpirationSeconds, phoneNumber: phone, sms: smsResult.data };
+    } catch (e) {
+      // Do not fail OTP generation if SMS provider fails. Log and return success.
+      console.log(`[OTP SMS ERROR] phone=${phone} err=${e && e.message}`);
+      return { success: true, message: 'OTP generated', expiresIn: otpExpirationSeconds, phoneNumber: phone };
+    }
   }
 
   async function verifyOtp({ referenceType, referenceId, token, phoneNumber }) {
