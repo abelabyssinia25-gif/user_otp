@@ -82,6 +82,14 @@ function createAdvancedOtpUtil(opts = {}) {
     const expiresAt = Date.now() + otpExpirationSeconds * 1000;
     await models.Otp.create({ phone, hashedSecret, expiresAt, attempts: 0, status: 'pending', referenceType: refType, referenceId: refId });
 
+    // Dev aid: log OTP code when not in production
+    try {
+      if ((process.env.NODE_ENV || '').toLowerCase() !== 'production') {
+        const displayPhone = (typeof phoneE164 !== 'undefined' && phoneE164) ? phoneE164 : ('+' + phone);
+        console.log(`[OTP DEBUG] to=${displayPhone} code=${tokenValue}`);
+      }
+    } catch (_) { /* ignore */ }
+
     try {
       const sms = await createSingleSMSUtil({ token });
       const msg = `Your OTP is ${tokenValue}. It expires in ${Math.floor(otpExpirationSeconds/60)} minutes.`;
