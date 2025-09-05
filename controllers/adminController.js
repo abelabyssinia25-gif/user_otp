@@ -109,3 +109,33 @@ const staff = await models.Staff.findAll({ include });
 return res.json(staff);
 } catch (e) { return res.status(500).json({ message: e.message }); }
 };
+
+// Award reward points to a driver (admin-only)
+exports.awardDriverPoints = async (req, res) => {
+try {
+const { driverId } = req.params;
+const { points } = req.body;
+const amount = Number(points);
+if (!Number.isFinite(amount) || amount === 0) return res.status(400).json({ message: 'points must be a non-zero number' });
+const driver = await models.Driver.findByPk(driverId);
+if (!driver) return res.status(404).json({ message: 'Driver not found' });
+driver.rewardPoints = (driver.rewardPoints || 0) + amount;
+await driver.save();
+return res.json({ message: 'Driver points updated', driverId: driver.id, rewardPoints: driver.rewardPoints });
+} catch (e) { return res.status(500).json({ message: e.message }); }
+};
+
+// Award reward points to a passenger (admin-only)
+exports.awardPassengerPoints = async (req, res) => {
+try {
+const { passengerId } = req.params;
+const { points } = req.body;
+const amount = Number(points);
+if (!Number.isFinite(amount) || amount === 0) return res.status(400).json({ message: 'points must be a non-zero number' });
+const passenger = await models.Passenger.findByPk(passengerId);
+if (!passenger) return res.status(404).json({ message: 'Passenger not found' });
+passenger.rewardPoints = (passenger.rewardPoints || 0) + amount;
+await passenger.save();
+return res.json({ message: 'Passenger points updated', passengerId: passenger.id, rewardPoints: passenger.rewardPoints });
+} catch (e) { return res.status(500).json({ message: e.message }); }
+};

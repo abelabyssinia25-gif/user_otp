@@ -695,6 +695,35 @@
           ]
         },
         {
+          "name": "Rewards",
+          "item": [
+            {
+              "name": "Award Points to Driver",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{authToken}}" }
+                ],
+                "body": { "mode": "raw", "raw": "{\n  \"points\": 50\n}" },
+                "url": { "raw": "{{baseUrl}}/admins/drivers/1/reward-points", "host": ["{{baseUrl}}"], "path": ["admins","drivers","1","reward-points"] }
+              }
+            },
+            {
+              "name": "Award Points to Passenger",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{authToken}}" }
+                ],
+                "body": { "mode": "raw", "raw": "{\n  \"points\": 25\n}" },
+                "url": { "raw": "{{baseUrl}}/admins/passengers/1/reward-points", "host": ["{{baseUrl}}"], "path": ["admins","passengers","1","reward-points"] }
+              }
+            }
+          ]
+        },
+        {
           "name": "Admin Passenger Management",
           "item": [
             {

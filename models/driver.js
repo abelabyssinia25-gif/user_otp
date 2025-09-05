@@ -1,4 +1,4 @@
-﻿module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
 const Driver = sequelize.define('Driver', {
 id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 name: { type: DataTypes.STRING, allowNull: false },
@@ -8,6 +8,7 @@ email: { type: DataTypes.STRING, allowNull: true, unique: true },
 wallet: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: 0 },
 rating: { type: DataTypes.FLOAT, defaultValue: 5.0 },
 ratingCount: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+rewardPoints: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 drivingLicenseFile: { type: DataTypes.STRING },
 document: { type: DataTypes.STRING },
 nationalIdFile: { type: DataTypes.STRING },

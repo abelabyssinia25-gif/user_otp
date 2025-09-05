@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/adminController');
 const auth = require('../middleware/auth');
@@ -14,6 +14,10 @@ router.post('/drivers/:driverId/approve', auth(), requirePermissions('driver:app
 router.post('/drivers/:driverId/documents/approve', auth(), requirePermissions('driver:documents:approve'), ctrl.approveDriverDocuments);
 router.post('/drivers/:driverId/documents/reject', auth(), requirePermissions('driver:documents:approve'), ctrl.rejectDriverDocuments);
 router.get('/drivers/pending-documents', auth(), requirePermissions('driver:documents:approve'), ctrl.getPendingDriverDocuments);
+
+// Reward points management
+router.post('/drivers/:driverId/reward-points', auth(), requirePermissions('driver:update'), ctrl.awardDriverPoints);
+router.post('/passengers/:passengerId/reward-points', auth(), requirePermissions('passenger:update'), ctrl.awardPassengerPoints);
 
 router.get('/users/filter', auth(), requirePermissions('user:read'), ctrl.filterByRole);
 
