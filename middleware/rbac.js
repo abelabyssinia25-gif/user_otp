@@ -1,8 +1,11 @@
-﻿function requireRoles(...allowedRoles) {
+function requireRoles(...allowedRoles) {
 return (req, res, next) => {
 if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
 const roles = req.user.roles || [];
-const ok = roles.some((r) => allowedRoles.includes(r) || allowedRoles.includes(r?.name));
+// Allow if any token role matches, or if the token type matches an allowed role (e.g., type 'admin')
+const hasRole = roles.some((r) => allowedRoles.includes(r) || allowedRoles.includes(r?.name));
+const typeMatches = req.user.type && allowedRoles.includes(req.user.type);
+const ok = hasRole || typeMatches;
 if (!ok) return res.status(403).json({ message: 'Forbidden' });
 next();
 };
