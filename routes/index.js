@@ -9,6 +9,7 @@ router.use('/staff', require('./staffRoutes'));
 router.use('/roles', require('./roleRoutes'));
 router.use('/permissions', require('./permissionRoutes'));
 router.use('/admins', require('./adminRoutes'));
+router.use('/trips', require('./tripRoutes'));
 // v1 passenger OTP routes removed; use /auth/request-otp and /auth/verify-otp
 
 

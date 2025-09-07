@@ -13,9 +13,23 @@ exports.list = async (req, res) => { try { const rows = await models.Passenger.f
 exports.get = async (req, res) => { try { const row = await models.Passenger.findByPk(req.params.id, { include: ['roles'] }); if (!row) return res.status(404).json({ message: 'Not found' }); return res.json(row); } catch (e) { return res.status(500).json({ message: e.message }); } };
 exports.update = async (req, res) => {
 try {
-const data = req.body;
-if (data.password) data.password = await hashPassword(data.password);
-// allow updating emergencyContacts and email through regular update
+const body = req.body || {};
+
+// Admin route: restrict updates to admin-controlled fields only
+// Explicitly block rating fields regardless of input
+const allowedFields = ['contractId', 'wallet'];
+const data = {};
+for (const key of allowedFields) {
+if (Object.prototype.hasOwnProperty.call(body, key)) data[key] = body[key];
+}
+// Never allow rating fields through this endpoint
+if ('rating' in data) delete data.rating;
+if ('ratingCount' in data) delete data.ratingCount;
+
+if (Object.keys(data).length === 0) {
+return res.status(400).json({ message: 'No updatable fields provided. Allowed fields: contractId, wallet' });
+}
+
 const [count] = await models.Passenger.update(data, { where: { id: req.params.id } });
 if (!count) return res.status(404).json({ message: 'Not found' });
 const updated = await models.Passenger.findByPk(req.params.id);
@@ -38,6 +52,12 @@ exports.updateMyProfile = async (req, res) => {
 try {
 if (req.user.type !== 'passenger') return res.status(403).json({ message: 'Only passengers can access this endpoint' });
 const data = req.body;
+
+// Prevent passengers from updating their own rating and rating count
+if ('rating' in data) delete data.rating;
+if ('ratingCount' in data) delete data.ratingCount;
+if ('rewardPoints' in data) delete data.rewardPoints;
+
 if (data.password) data.password = await hashPassword(data.password);
 const [count] = await models.Passenger.update(data, { where: { id: req.user.id } });
 if (!count) return res.status(404).json({ message: 'Passenger not found' });
@@ -55,12 +75,34 @@ return res.status(204).send();
 } catch (e) { return res.status(500).json({ message: e.message }); }
 };
 
-// Minimal stub to satisfy route handler and prevent runtime crash
+// Passenger rates driver
 exports.rateDriver = async (req, res) => {
 try {
-// In a real implementation, you would validate input, persist rating,
-// and maybe recalculate driver's average rating.
-return res.status(200).json({ message: 'Rating received', driverId: req.params.driverId });
+if (req.user.type !== 'passenger') return res.status(403).json({ message: 'Only passengers can rate drivers' });
+const { rating, comment } = req.body;
+const driverId = req.params.driverId;
+
+// Prevent passengers from rating themselves
+if (req.user.id == driverId) {
+  return res.status(400).json({ message: 'Passengers cannot rate themselves' });
+}
+
+// Validate rating input
+if (!rating || rating < 1 || rating > 5) {
+  return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+}
+
+const driver = await models.Driver.findByPk(driverId);
+if (!driver) return res.status(404).json({ message: 'Driver not found' });
+
+const currentRating = driver.rating || 0;
+const ratingCount = driver.ratingCount || 0;
+const newRatingCount = ratingCount + 1;
+const newRating = ((currentRating * ratingCount) + Number(rating)) / newRatingCount;
+
+await models.Driver.update({ rating: newRating, ratingCount: newRatingCount }, { where: { id: driverId } });
+const updatedDriver = await models.Driver.findByPk(driverId);
+return res.json({ message: 'Driver rated successfully', driver: updatedDriver, rating, comment });
 } catch (e) { return res.status(500).json({ message: e.message }); }
 };
 

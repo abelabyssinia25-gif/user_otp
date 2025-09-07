@@ -93,8 +93,19 @@ const exists = await models.Admin.findOne({ where: { username } });
 if (exists) return res.status(409).json({ message: 'Username already exists' });
 const hashed = await hashPassword(password);
 const admin = await models.Admin.create({ fullName, username, password: hashed });
+// Super admin gets empty permissions array to keep token short
 const token = sign({ id: admin.id, type: 'admin', roles: ['superadmin'], permissions: [] });
-return res.status(201).json({ token, admin });
+
+// Return clean admin object without sensitive information
+const cleanAdmin = {
+  id: admin.id,
+  fullName: admin.fullName,
+  username: admin.username,
+  email: admin.email,
+  roles: ['superadmin']
+};
+
+return res.status(201).json({ token, admin: cleanAdmin });
 } catch (e) { return res.status(500).json({ message: e.message }); }
 }
 
@@ -106,9 +117,26 @@ if (!admin) return res.status(404).json({ message: 'Not found' });
 const ok = await comparePassword(password, admin.password);
 if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
 const roles = (admin.roles || []).map(r => r.name);
-const perms = Array.from(new Set((admin.roles || []).flatMap(r => (r.permissions || []).map(p => p.name))));
-const token = sign({ id: admin.id, type: 'admin', roles, permissions: perms });
-return res.json({ token, admin });
+// For super admin, exclude permissions from token to keep it short
+// RBAC middleware will handle admin privileges based on type and roles
+const isSuperAdmin = roles.includes('superadmin');
+const token = sign({ 
+  id: admin.id, 
+  type: 'admin', 
+  roles, 
+  permissions: isSuperAdmin ? [] : Array.from(new Set((admin.roles || []).flatMap(r => (r.permissions || []).map(p => p.name))))
+});
+
+// Return clean admin object without detailed role/permission information
+const cleanAdmin = {
+  id: admin.id,
+  fullName: admin.fullName,
+  username: admin.username,
+  email: admin.email,
+  roles: roles // Just the role names, not the full objects
+};
+
+return res.json({ token, admin: cleanAdmin });
 } catch (e) { return res.status(500).json({ message: e.message }); }
 }
 

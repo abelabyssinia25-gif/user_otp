@@ -7,7 +7,7 @@ const { requirePermissions, requireRoles } = require('../middleware/rbac');
 router.post('/', auth(), requirePermissions('admin:create'), ctrl.create);
 router.get('/', auth(), requirePermissions('admin:read'), ctrl.list);
 router.get('/:id', auth(), requirePermissions('admin:read'), ctrl.get);
-router.put('/:id', auth(), requirePermissions('admin:update'), ctrl.update);
+router.put('/:id', auth(), requirePermissions('admin:update'), ctrl.update);    
 router.delete('/:id', auth(), requirePermissions('admin:delete'), ctrl.remove);
 
 router.post('/drivers/:driverId/approve', auth(), requirePermissions('driver:approve'), ctrl.approveDriver);
@@ -15,9 +15,9 @@ router.post('/drivers/:driverId/documents/approve', auth(), requirePermissions('
 router.post('/drivers/:driverId/documents/reject', auth(), requirePermissions('driver:documents:approve'), ctrl.rejectDriverDocuments);
 router.get('/drivers/pending-documents', auth(), requirePermissions('driver:documents:approve'), ctrl.getPendingDriverDocuments);
 
-// Reward points management
-router.post('/drivers/:driverId/reward-points', auth(), requireRoles('admin', 'superadmin'), ctrl.awardDriverPoints);
-router.post('/passengers/:passengerId/reward-points', auth(), requireRoles('admin', 'superadmin'), ctrl.awardPassengerPoints);
+// Reward points calculation (based on trip history)
+router.post('/drivers/:driverId/calculate-reward-points', auth(), requireRoles('admin', 'superadmin'), ctrl.calculateDriverRewardPoints);
+router.post('/passengers/:passengerId/calculate-reward-points', auth(), requireRoles('admin', 'superadmin'), ctrl.calculatePassengerRewardPoints);
 
 router.get('/users/filter', auth(), requirePermissions('user:read'), ctrl.filterByRole);
 

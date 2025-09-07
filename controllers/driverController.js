@@ -13,7 +13,11 @@ exports.list = async (req, res) => { try { const rows = await models.Driver.find
 exports.get = async (req, res) => { try { const row = await models.Driver.findByPk(req.params.id, { include: ['roles'] }); if (!row) return res.status(404).json({ message: 'Not found' }); return res.json(row); } catch (e) { return res.status(500).json({ message: e.message }); } };
 exports.update = async (req, res) => {
 try {
-const data = req.body;
+const body = req.body || {};
+// Prevent updates to rating fields from admin route
+const data = { ...body };
+if ('rating' in data) delete data.rating;
+if ('ratingCount' in data) delete data.ratingCount;
 if (data.password) data.password = await hashPassword(data.password);
 const [count] = await models.Driver.update(data, { where: { id: req.params.id } });
 if (!count) return res.status(404).json({ message: 'Not found' });
@@ -37,6 +41,12 @@ exports.updateMyProfile = async (req, res) => {
 try {
 if (req.user.type !== 'driver') return res.status(403).json({ message: 'Only drivers can access this endpoint' });
 const data = req.body;
+
+// Prevent drivers from updating their own rating and rating count
+if ('rating' in data) delete data.rating;
+if ('ratingCount' in data) delete data.ratingCount;
+if ('rewardPoints' in data) delete data.rewardPoints;
+
 if (data.password) data.password = await hashPassword(data.password);
 const [count] = await models.Driver.update(data, { where: { id: req.user.id } });
 if (!count) return res.status(404).json({ message: 'Driver not found' });
@@ -97,6 +107,16 @@ try {
 if (req.user.type !== 'driver') return res.status(403).json({ message: 'Only drivers can rate passengers' });
 const { rating, comment } = req.body;
 const passengerId = req.params.passengerId;
+
+// Prevent drivers from rating themselves
+if (req.user.id == passengerId) {
+  return res.status(400).json({ message: 'Drivers cannot rate themselves' });
+}
+
+// Validate rating input
+if (!rating || rating < 1 || rating > 5) {
+  return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+}
 
 const passenger = await models.Passenger.findByPk(passengerId);
 if (!passenger) return res.status(404).json({ message: 'Passenger not found' });

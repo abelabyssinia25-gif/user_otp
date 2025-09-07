@@ -98,6 +98,7 @@ Wallet.belongsTo(Driver, {
   foreignKey: { name: 'driverId', field: 'driver_id' },
 });
 
+
 module.exports = {
 sequelize,
 Sequelize,

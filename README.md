@@ -22,7 +22,7 @@
 
 ## Project Overview
 
-This is the backend API for the RideShare application, built using Express.js and MySQL (via Sequelize). It handles user management (passengers, drivers, staff, admins), authentication, RBAC, driver document uploads, ratings, and admin operations.
+This is the backend API for the RideShare application, built using Express.js and MySQL (via Sequelize). It handles user management (passengers, drivers, staff, admins), authentication, RBAC, driver document uploads, ratings, and admin operations. **This service integrates with the booking service for trip management and reward points calculation.**
 
 ---
 
@@ -32,7 +32,9 @@ This is the backend API for the RideShare application, built using Express.js an
 - Role and permission-based access control (RBAC)
 - Passenger profile management, including self-delete
 - Driver document uploads and approval workflow (pending/approved/rejected)
-- Passenger and Driver rating flows
+- **Trip/Booking management system with approval requirements**
+- **Secure rating system (passengers can only be rated by drivers, drivers cannot rate themselves)**
+- **Automatic reward points calculation based on trip history**
 - Driver Wallet model with association
 - Basic rate limiting on auth endpoints
 
@@ -109,6 +111,7 @@ The server starts at http://localhost:PORT (default 3000). All APIs are mounted 
 - JWT_SECRET: Secret for JWT signing
 - PORT: Server port (default 3000)
 - SEQ_LOG: Enable Sequelize logging (true/false)
+- **BOOKING_SERVICE_URL: URL of the booking service (default http://localhost:3001/api)**
 
 ---
 
@@ -181,6 +184,17 @@ Base URL: `http://localhost:PORT/api`
 - GET `/admins/drivers/pending-documents`
 - GET `/admins/users/filter?role=driver|passenger|staff|admin`
 - GET `/admins/staff?role=dispatcher`
+- **POST `/admins/drivers/:driverId/calculate-reward-points` (calculate based on trip history)**
+- **POST `/admins/passengers/:passengerId/calculate-reward-points` (calculate based on trip history)**
+
+### Trips/Bookings (Integrated with Booking Service)
+- **POST `/trips` (create trip request - calls booking service)**
+- **POST `/trips/:tripId/accept` (driver accepts trip - calls booking service)**
+- **POST `/trips/:tripId/start` (driver starts trip - calls booking service)**
+- **POST `/trips/:tripId/complete` (driver completes trip - calls booking service)**
+- **POST `/trips/:tripId/rate-passenger` (driver rates passenger after trip - calls booking service)**
+- **POST `/trips/:tripId/rate-driver` (passenger rates driver after trip - calls booking service)**
+- **GET `/trips/history/:userType/:userId` (get trip history - calls booking service)**
 
 ### Roles
 - POST `/roles`
@@ -217,17 +231,6 @@ Base URL: `http://localhost:PORT/api`
 └── README.md
 ```
 
----
-
-## Development Notes
-
-- Controllers use named exports: `exports.fnName = async (req, res) => { ... }`
-- Admin panel: current RBAC middleware allows any authenticated admin to access admin endpoints. For strict permissions, remove the bypass in `middleware/rbac.js` and run the seeder to attach permissions.
-- Driver Wallet association alias is `walletAccount`.
-- Passenger `contractId` is supported (DB column `contract_id`).
-- Import the Postman collection at `postman/rideshare.postman_collection.json`. Set `baseUrl` and `authToken` in Postman.
-
----
 
 ## Contributing
 
